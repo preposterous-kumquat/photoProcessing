@@ -4,10 +4,27 @@ const s3 = require('../config/amazon_s3.js').s3;
 const bucket = require('../config/amazon_s3.js').bucket;
 const fs = require('fs');
 const generateFilePath = require('../config/helpers').generateFilePath;
+const async = require('async');
 
 module.exports = (req, res) => {
   let id = req.params.id;
   let path = generateFilePath(id);
+
+  async.parallel({
+    metadata: (callback) => {
+      photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
+        callback(null, data);
+      });
+    },
+    // clarifai: (callback) => {
+
+    // }
+  }, (err, results) => {
+    if (err) {
+      console.error('ERROR: ', err);
+    }
+    console.log('DONE', results);
+  });
 
 
   res.send(req.file);
