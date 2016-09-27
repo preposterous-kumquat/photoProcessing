@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/preposterous-kumquat/photoProcessing#readme",
   "dependencies": {
+    "async": "^2.0.1",
     "aws-sdk": "^2.6.4",
     "body-parser": "^1.15.2",
     "exif": "^0.6.0",
@@ -28,10 +29,8 @@
     "morgan": "^1.7.0",
     "multer": "^1.2.0",
     "pg": "^6.1.0",
-    "sequelize": "^3.24.3",
-    "multer": "^1.2.0",
-    "pg": "^6.1.0",
-    "request": "^2.75.0"
+    "request": "^2.75.0",
+    "sequelize": "^3.24.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
