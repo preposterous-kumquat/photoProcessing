@@ -1,15 +1,16 @@
 const photoMetaData = require('./photoMetadata.js');
 const gm = require('gm').subClass({imageMagick: true});
-const s3 = require('./amazon_s3.js').s3;
-const bucket = require('./amazon_s3.js').bucket;
+const s3 = require('../config/amazon_s3.js').s3;
+const bucket = require('../config/amazon_s3.js').bucket;
 const fs = require('fs');
 const generateFilePath = require('../config/helpers').generateFilePath;
 
 module.exports = (req, res) => {
   let id = req.params.id;
   let path = generateFilePath(id);
-  console.log(req.file);
-  res.send(req.file)
+
+
+  res.send(req.file);
 
   /*************************** PHOTO API **********************************/
     // send the photo to the api and return that data when ready
