@@ -3,34 +3,40 @@ const gm = require('gm').subClass({imageMagick: true});
 const s3 = require('./amazon_s3.js').s3;
 const bucket = require('./amazon_s3.js').bucket;
 const fs = require('fs');
+const generateFilePath = require('../config/helpers').generateFilePath;
 
 module.exports = (req, res) => {
+  let id = req.params.id;
+  let path = generateFilePath(id);
+  console.log(req.file);
+  res.send(req.file)
+
   /*************************** PHOTO API **********************************/
     // send the photo to the api and return that data when ready
 
 
   /************************* PHOTO METADATA *******************************/
-  let data = photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
-    console.log(data, '<--- photo metadata');
-    if (data.coordinates === 'No GPS data') {
-      console.log('metadata does not exist!');
-    }
-  });
+  // let data = photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
+  //   console.log(data, '<--- photo metadata');
+  //   if (data.coordinates === 'No GPS data') {
+  //     console.log('metadata does not exist!');
+  //   }
+  // });
 
   /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
-  let tempPath = `${__dirname}/../${req.file.path}`;
-  let fileName = req.file.originalname.split('.')[0];
-  let fileExt = req.file.originalname.split('.')[1];
-  let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
+  // let tempPath = `${__dirname}/../${req.file.path}`;
+  // let fileName = req.file.originalname.split('.')[0];
+  // let fileExt = req.file.originalname.split('.')[1];
+  // let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
 
 
-  gm(tempPath)
-    .resize(720, 720)
-    .write(resizedPath, (err, done) => {
-      if (err) { 
-        console.log(`Error in resizing ${err}`);
-      } else {
-        console.log(`Photo resized ${done}`);
+  // gm(tempPath)
+  //   .resize(720, 720)
+  //   .write(resizedPath, (err, done) => {
+  //     if (err) { 
+  //       console.log(`Error in resizing ${err}`);
+  //     } else {
+  //       console.log(`Photo resized ${done}`);
 
 
         // let deleteTemp = [tempPath, resizedPath];
@@ -78,8 +84,8 @@ module.exports = (req, res) => {
         //   }
         // }); 
 
-      }
-    });
+    //   }
+    // });
 };
 
 // Need to create a file to hash the file names
