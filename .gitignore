@@ -1,0 +1,8 @@
+# node modules
+node_modules/
+
+# Secret Keys
+api-key.js
+
+# DS Store
+.DS_Store
