@@ -8,7 +8,7 @@ function generateFilePath (num, charBlock) {
   let path = '';
   for (let i = 0; i < padded.length; i++) {
     if (i !== 0 && i % charBlock === 0) {
-      path += `/`;
+      path += '/';
     }
     path += padded[i];
   }

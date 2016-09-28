@@ -5,29 +5,38 @@ const bucket = require('../config/amazon_s3.js').bucket;
 const fs = require('fs');
 const generateFilePath = require('../config/helpers').generateFilePath;
 const async = require('async');
+const clarifai = require('./clarifai');
+const helpers = require('../config/helpers').generateFilePath;
+
 
 module.exports = (req, res) => {
+  console.log(req.file, 'FILE');
+  console.log(req.body, 'BODY');
+  console.log('enter request body');
   let id = req.params.id;
-  let path = generateFilePath(id);
+  console.log(id);
+  let path = generateFilePath(id, 3);
+  console.log(path);
 
-  async.parallel({
-    metadata: (callback) => {
-      photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
-        callback(null, data);
-      });
-    },
-    // clarifai: (callback) => {
+  // clarifai(url, (err, results) => {
+  //   console.log(results);
+  // });
 
-    // }
-  }, (err, results) => {
-    if (err) {
-      console.error('ERROR: ', err);
-    }
-    console.log('DONE', results);
-  });
+  // async.parallel({
+  //   metadata: (callback) => {
+  //     photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
+  //       callback(null, data);
+  //     });
+  //   },
+  //   // clarifai: (callback) => {
 
-
-  res.send(req.file);
+  //   // }
+  // }, (err, results) => {
+  //   if (err) {
+  //     console.error('ERROR: ', err);
+  //   }
+  //   console.log('DONE', results);
+  // });
 
   /*************************** PHOTO API **********************************/
     // send the photo to the api and return that data when ready
@@ -71,9 +80,11 @@ module.exports = (req, res) => {
         // let fileStream = fs.readFileSync(resizedPath);
 
         // let options = {
+        //   ACL: 'public-read',
         //   Bucket: bucket,
-        //   Key: `000/${req.file.originalname}`,
-        //   Body: fileStream
+        //   Key: path,
+        //   Body: fileStream,
+        //   ContentType: 'image/jpeg'
         // };
 
 
@@ -85,19 +96,35 @@ module.exports = (req, res) => {
         //   } else {
         //     console.log('DONE FROM S3:', upload);
 
-        //     // url = upload.S3.Location
+        //     url = upload.Location;
         //     // eTag = upload.S3.ETag
 
-        //     res.status(200).end('File uploaded');
-        //     let deleteTemp = [tempPath, resizedPath];
+        //     clarifai(url, (err, results) => {
+        //       console.log(results, 'GOT MY CLARIFAI RESULTS BACK');
+        //     });
 
-        //     fs.unlink(path, (err, deleted) => {
-        //       if (err) {
-        //         console.log('Error on file delete: ', err);
-        //       } else {
-        //         console.log('Temp file deleted', deleted);
-        //       }
-        //     }); 
+        //     res.status(200).end('File uploaded');
+
+        //     let deleteTemp = [tempPath, resizedPath];
+        //     deleteTemp.forEach((path) => {
+        //       fs.unlink(path, (err) => {
+        //         if (err) {
+        //           console.log('Error on file delete: ', err);
+        //         } else {
+        //           console.log('Temp file deleted');
+        //         }
+        //       }); 
+        //     });
+
+        //     // let deleteTemp = [tempPath, resizedPath];
+
+        //     // fs.unlink(path, (err, deleted) => {
+        //     //   if (err) {
+        //     //     console.log('Error on file delete: ', err);
+        //     //   } else {
+        //     //     console.log('Temp file deleted', deleted);
+        //     //   }
+        //     // }); 
             
         //   }
         // }); 
