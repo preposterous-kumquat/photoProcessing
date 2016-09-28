@@ -26,7 +26,7 @@ const extractGPSData = (exifData) => {
 
 const extractLatLongData = (gps) => {
   if (gps === null) {
-    return null;
+    return 'No GPS data';
   }
   const lat = gps.GPSLatitude;
   lat.push(gps.GPSLatitudeRef);

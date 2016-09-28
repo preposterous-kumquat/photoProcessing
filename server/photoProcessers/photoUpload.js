@@ -10,33 +10,10 @@ const helpers = require('../config/helpers').generateFilePath;
 
 
 module.exports = (req, res) => {
+  console.log('entered here')
   console.log(req.file, 'FILE');
-  console.log(req.body, 'BODY');
-  console.log('enter request body');
   let id = req.params.id;
-  console.log(id);
   let path = generateFilePath(id, 3);
-  console.log(path);
-
-  // clarifai(url, (err, results) => {
-  //   console.log(results);
-  // });
-
-  // async.parallel({
-  //   metadata: (callback) => {
-  //     photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
-  //       callback(null, data);
-  //     });
-  //   },
-  //   // clarifai: (callback) => {
-
-  //   // }
-  // }, (err, results) => {
-  //   if (err) {
-  //     console.error('ERROR: ', err);
-  //   }
-  //   console.log('DONE', results);
-  // });
 
   /*************************** PHOTO API **********************************/
     // send the photo to the api and return that data when ready
@@ -46,92 +23,94 @@ module.exports = (req, res) => {
   // let data = photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
   //   console.log(data, '<--- photo metadata');
   //   if (data.coordinates === 'No GPS data') {
-  //     console.log('metadata does not exist!');
+  //     console.log(data, 'metadata does not exist!');
   //   }
   // });
 
   /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
-  // let tempPath = `${__dirname}/../${req.file.path}`;
-  // let fileName = req.file.originalname.split('.')[0];
-  // let fileExt = req.file.originalname.split('.')[1];
-  // let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
+  let tempPath = `${__dirname}/../${req.file.path}`;
+  let fileName = req.file.originalname.split('.')[0];
+  let fileExt = req.file.originalname.split('.')[1];
+  let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
 
+  gm(tempPath)
+    .resize(720, 720)
+    .write(resizedPath, (err, done) => {
+      if (err) { 
+        console.log(`Error in resizing ${err}`);
+      } else {
+        console.log(`Photo resized ${done}`);
+        let fileStream = fs.readFileSync(resizedPath);
+        let options = {
+          ACL: 'public-read',
+          Bucket: bucket,
+          Key: path,
+          Body: fileStream,
+          ContentType: 'image/jpeg'
+        };
 
-  // gm(tempPath)
-  //   .resize(720, 720)
-  //   .write(resizedPath, (err, done) => {
-  //     if (err) { 
-  //       console.log(`Error in resizing ${err}`);
-  //     } else {
-  //       console.log(`Photo resized ${done}`);
-
-
-        // let deleteTemp = [tempPath, resizedPath];
-        // deleteTemp.forEach((path) => {
-        //   fs.unlink(path, (err) => {
-        //     if (err) {
-        //       console.log('Error on file delete: ', err);
-        //     } else {
-        //       console.log('Temp file deleted');
-        //     }
-        //   }); 
-        // });
-
-        // let fileStream = fs.readFileSync(resizedPath);
-
-        // let options = {
-        //   ACL: 'public-read',
-        //   Bucket: bucket,
-        //   Key: path,
-        //   Body: fileStream,
-        //   ContentType: 'image/jpeg'
-        // };
-
-
-        // s3.upload(options, function (err, upload) {
-        //   console.log('entered s3 function');
-        //   if (err) {
-        //     console.log('Failure error: ', err);
-        //     return res.status(500).end('Upload to s3 failed');
-        //   } else {
-        //     console.log('DONE FROM S3:', upload);
-
-        //     url = upload.Location;
-        //     // eTag = upload.S3.ETag
-
-        //     clarifai(url, (err, results) => {
-        //       console.log(results, 'GOT MY CLARIFAI RESULTS BACK');
-        //     });
-
-        //     res.status(200).end('File uploaded');
-
-        //     let deleteTemp = [tempPath, resizedPath];
-        //     deleteTemp.forEach((path) => {
-        //       fs.unlink(path, (err) => {
-        //         if (err) {
-        //           console.log('Error on file delete: ', err);
-        //         } else {
-        //           console.log('Temp file deleted');
-        //         }
-        //       }); 
-        //     });
-
-        //     // let deleteTemp = [tempPath, resizedPath];
-
-        //     // fs.unlink(path, (err, deleted) => {
-        //     //   if (err) {
-        //     //     console.log('Error on file delete: ', err);
-        //     //   } else {
-        //     //     console.log('Temp file deleted', deleted);
-        //     //   }
-        //     // }); 
-            
-        //   }
-        // }); 
-
-    //   }
-    // });
+        s3.upload(options, function (err, upload) {
+          console.log('entered s3 function');
+          if (err) {
+            console.log('Failure error: ', err);
+            return res.status(500).end('Upload to s3 failed');
+          } else {
+            console.log('DONE FROM S3:', upload);
+            url = upload.Location;
+            console.log('url', url);
+            res.status(200).end('File uploaded');
+          }
+        });
+      }
+    });
 };
+
+// clarifai(url, (err, results) => {
+//   console.log(results, 'GOT MY CLARIFAI RESULTS BACK');
+// });
+
+
+// async.parallel({
+//   metadata: (callback) => {
+//     photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
+//       callback(null, data);
+//     });
+//   },
+//   // clarifai: (callback) => {
+
+//   // }
+// }, (err, results) => {
+//   if (err) {
+//     console.error('ERROR: ', err);
+//   }
+//   console.log('DONE', results);
+// });
+
+
+// let deleteTemp = [tempPath, resizedPath];
+
+// fs.unlink(path, (err, deleted) => {
+//   if (err) {
+//     console.log('Error on file delete: ', err);
+//   } else {
+//     console.log('Temp file deleted', deleted);
+//   }
+// }); 
+
+
+
+// let deleteTemp = [tempPath, resizedPath];
+// deleteTemp.forEach((path) => {
+//   fs.unlink(path, (err) => {
+//     if (err) {
+//       console.log('Error on file delete: ', err);
+//     } else {
+//       console.log('Temp file deleted');
+//     }
+//   }); 
+// });
+
+// let fileStream = fs.readFileSync(resizedPath);
 
 // Need to create a file to hash the file names
 
