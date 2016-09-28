@@ -8,16 +8,9 @@ const async = require('async');
 const clarifai = require('./clarifai');
 const helpers = require('../config/helpers').generateFilePath;
 
-
 module.exports = (req, res) => {
-  console.log('entered here')
-  console.log(req.file, 'FILE');
   let id = req.params.id;
   let path = generateFilePath(id, 3);
-
-  /*************************** PHOTO API **********************************/
-    // send the photo to the api and return that data when ready
-
 
   /************************* PHOTO METADATA *******************************/
   // let data = photoMetaData(`${__dirname}/../${req.file.path}`, (err, data) => {
@@ -40,6 +33,7 @@ module.exports = (req, res) => {
         console.log(`Error in resizing ${err}`);
       } else {
         console.log(`Photo resized ${done}`);
+
         let fileStream = fs.readFileSync(resizedPath);
         let options = {
           ACL: 'public-read',
@@ -49,18 +43,18 @@ module.exports = (req, res) => {
           ContentType: 'image/jpeg'
         };
 
-        s3.upload(options, function (err, upload) {
-          console.log('entered s3 function');
-          if (err) {
-            console.log('Failure error: ', err);
-            return res.status(500).end('Upload to s3 failed');
-          } else {
-            console.log('DONE FROM S3:', upload);
-            url = upload.Location;
+        s3.uploadAsync(options)
+          .then((upload) => {
+            let url = upload.Location;
             console.log('url', url);
             res.status(200).end('File uploaded');
-          }
-        });
+          })
+          .catch((err) => {
+            console.log('Failure error: ', err);
+            return res.status(500).end('Upload to s3 failed');
+          });
+
+
       }
     });
 };

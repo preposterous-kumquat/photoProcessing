@@ -1,5 +1,6 @@
 const aws = require('aws-sdk');
 const amazonS3Keys = require('../../api-key.js').amazon_S3;
+const Promise = require('bluebird');
 
 aws.config.update({
   accessKeyId: amazonS3Keys.aws_access_key_id,
@@ -8,6 +9,7 @@ aws.config.update({
 });
 
 const s3 = new aws.S3();
+Promise.promisifyAll(Object.getPrototypeOf(s3));
 
 module.exports = {
   s3: s3,
