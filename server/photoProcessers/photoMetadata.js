@@ -1,41 +1,28 @@
 var ExifImage = require('exif').ExifImage;
+const Promise = require('bluebird');
 
 module.exports = (filepath, callback) => {
-  console.log('inside photo meta data', filepath);
-  try {
+  return new Promise(function(resolve, reject) {
     new ExifImage({ image: filepath }, function (error, exifData) {
-      if (error) {
-        console.log('Error: ', error.message);
-      } else {  
-        callback(null, extractGPSData(exifData));
-      }
+      resolve(extractLatLongData(exifData));
+      reject(error);
     });
-  } catch (error) {
-    callback(error);
-  }
+  });
 };
 
-const extractGPSData = (exifData) => {
-  var gps = exifData.gps.GPSLatitude !== undefined ? exifData.gps : null;
-  return {
-    creationDate: exifData.exif.CreateDate,
-    dateTimeOriginal: exifData.exif.DateTimeOriginal,
-    coordinates: extractLatLongData(gps)
-  };
-};
-
-const extractLatLongData = (gps) => {
-  if (gps === null) {
-    return 'No GPS data';
+const extractLatLongData = (exif) => {
+  if (exif && exif.gps) {
+    const lat = exif.gps.GPSLatitude;
+    lat.push(exif.gps.GPSLatitudeRef);
+    const long = exif.gps.GPSLongitude;
+    long.push(exif.gps.GPSLongitudeRef);
+    return {
+      lat: convertDMSToDD(lat[0], lat[1], lat[2], lat[3]),
+      long: convertDMSToDD(long[0], long[1], long[2], long[3])
+    };
+  } else {
+    return null;
   }
-  const lat = gps.GPSLatitude;
-  lat.push(gps.GPSLatitudeRef);
-  const long = gps.GPSLongitude;
-  long.push(gps.GPSLongitudeRef);
-  return {
-    lat: convertDMSToDD(lat[0], lat[1], lat[2], lat[3]),
-    long: convertDMSToDD(long[0], long[1], long[2], long[3])
-  };
 };
 
 const convertDMSToDD = (degrees, minutes, seconds, direction) => {
@@ -45,6 +32,7 @@ const convertDMSToDD = (degrees, minutes, seconds, direction) => {
   } // Don't do anything for N or E
   return dd;
 };
+
 
 // var testResult = { image:
 //    { Make: 'Apple',
