@@ -1,1 +1,3 @@
 # photoProcessing
+
+## npm install
