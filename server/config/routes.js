@@ -6,5 +6,5 @@ module.exports = (app, express) => {
     console.log('requested', req.body);
     res.send('here');
   });
-  app.post('/photoProcessor/upload/:id', multer, photoUpload);
+  app.post('/photoProcessor/upload', multer, photoUpload);
 };

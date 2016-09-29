@@ -9,58 +9,67 @@ const clarifai = require('./clarifai');
 const helpers = require('../config/helpers').generateFilePath;
 
 module.exports = (req, res) => {
-  let id = req.params.id;
+  console.log('ENTERED PHOTOUPLOAD')
+  let id = req.body.id;
   let path = generateFilePath(id, 3);
-  let gps = null;
+  let response = {
+    id: id,
+    path: path,
+  };
 
   /************************* PHOTO METADATA *******************************/
-
   photoMetaData(`${__dirname}/../${req.file.path}`)
     .then((gps) => {
       console.log('GPS', gps);
+      response['gps'] = gps;
     })
     .catch((err) => {
       console.log('ERROR', err);
     });
+
   /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
 
 
-  // let tempPath = `${__dirname}/../${req.file.path}`;
-  // let fileName = req.file.originalname.split('.')[0];
-  // let fileExt = req.file.originalname.split('.')[1];
-  // let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
+  let tempPath = `${__dirname}/../${req.file.path}`;
+  let fileName = req.file.originalname.split('.')[0];
+  let fileExt = req.file.originalname.split('.')[1];
+  let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
 
-  // gm(tempPath)
-  //   .resize(720, 720)
-  //   .write(resizedPath, (err, done) => {
-  //     if (err) { 
-  //       console.log(`Error in resizing ${err}`);
-  //     } else {
-  //       console.log(`Photo resized ${done}`);
+  gm(tempPath)
+    .resize(720, 720)
+    .write(resizedPath, (err, done) => {
+      if (err) { 
+        console.log(`Error in resizing ${err}`);
+      } else {
+        console.log(`Photo resized ${done}`);
 
-  //       let fileStream = fs.readFileSync(resizedPath);
-  //       let options = {
-  //         ACL: 'public-read',
-  //         Bucket: bucket,
-  //         Key: path,
-  //         Body: fileStream,
-  //         ContentType: 'image/jpeg'
-  //       };
+        let fileStream = fs.readFileSync(resizedPath);
+        let options = {
+          ACL: 'public-read',
+          Bucket: bucket,
+          Key: path,
+          Body: fileStream,
+          ContentType: 'image/jpeg'
+        };
 
-  //       s3.uploadAsync(options)
-  //         .then((upload) => {
-  //           let url = upload.Location;
-  //           console.log('url', url);
-  //           res.status(200).end('File uploaded');
-  //         })
-  //         .catch((err) => {
-  //           console.log('Failure error: ', err);
-  //           return res.status(500).end('Upload to s3 failed');
-  //         });
+        s3.uploadAsync(options)
+          .then((upload) => {
+            let url = upload.Location;
 
+            response['url'] = url;
 
-  //     }
-  //   });
+            clarifai(url, (err, success) => {
+              console.log('on photo upload', success);
+              response['clarifaiKeywords'] = success;
+              res.status(200).json(response);
+            });
+          })
+          .catch((err) => {
+            console.log('Failure error: ', err);
+            return res.status(500).end('Upload to s3 failed');
+          });
+      }
+    });
 };
 
 

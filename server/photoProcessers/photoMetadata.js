@@ -11,7 +11,8 @@ module.exports = (filepath, callback) => {
 };
 
 const extractLatLongData = (exif) => {
-  if (exif && exif.gps) {
+  if (exif && exif.gps && exif.gps.GPSLatitude) {
+    console.log(exif.gps, 'the gps data');
     const lat = exif.gps.GPSLatitude;
     lat.push(exif.gps.GPSLatitudeRef);
     const long = exif.gps.GPSLongitude;
@@ -32,6 +33,17 @@ const convertDMSToDD = (degrees, minutes, seconds, direction) => {
   } // Don't do anything for N or E
   return dd;
 };
+
+// Promise:
+// module.exports = (filepath, callback) => {
+//   return new Promise(function(resolve, reject) {
+//     new ExifImage({ image: filepath }, function (error, exifData) {
+//       resolve(extractLatLongData(exifData));
+//       reject(error);
+//     });
+//   });
+// };
+
 
 
 // var testResult = { image:
