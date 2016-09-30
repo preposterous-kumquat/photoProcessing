@@ -1,7 +1,7 @@
 var ExifImage = require('exif').ExifImage;
 const Promise = require('bluebird');
 
-module.exports = (filepath, callback) => {
+module.exports = (filepath) => {
   return new Promise(function(resolve, reject) {
     new ExifImage({ image: filepath }, function (error, exifData) {
       resolve(extractLatLongData(exifData));
@@ -12,7 +12,6 @@ module.exports = (filepath, callback) => {
 
 const extractLatLongData = (exif) => {
   if (exif && exif.gps && exif.gps.GPSLatitude) {
-    console.log(exif.gps, 'the gps data');
     const lat = exif.gps.GPSLatitude;
     lat.push(exif.gps.GPSLatitudeRef);
     const long = exif.gps.GPSLongitude;

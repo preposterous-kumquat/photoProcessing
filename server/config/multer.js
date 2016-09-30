@@ -4,3 +4,4 @@ const type = upload.single('photo');
 
 module.exports = type;
 
+
