@@ -6,9 +6,9 @@
 From within the root directory
 ```sh
 npm install
-nodemon
 brew install graphicsmagick
 brew install imagemagick
+nodemon
 ```
 
 ### API Key Set-Up:
