@@ -1,7 +1,7 @@
 var ExifImage = require('exif').ExifImage;
 const Promise = require('bluebird');
 
-module.exports = (filepath, callback) => {
+module.exports = (filepath) => {
   return new Promise(function(resolve, reject) {
     new ExifImage({ image: filepath }, function (error, exifData) {
       resolve(extractLatLongData(exifData));
