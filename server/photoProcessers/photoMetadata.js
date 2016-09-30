@@ -12,7 +12,6 @@ module.exports = (filepath) => {
 
 const extractLatLongData = (exif) => {
   if (exif && exif.gps && exif.gps.GPSLatitude) {
-    console.log(exif.gps, 'the gps data');
     const lat = exif.gps.GPSLatitude;
     lat.push(exif.gps.GPSLatitudeRef);
     const long = exif.gps.GPSLongitude;
