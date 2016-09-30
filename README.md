@@ -7,7 +7,9 @@ From within the root directory
 ```sh
 npm install
 nodemon
-``
+brew install graphicsmagick
+brew install imagemagick
+```
 
 ### API Key Set-Up:
 #### Create api-key.js
