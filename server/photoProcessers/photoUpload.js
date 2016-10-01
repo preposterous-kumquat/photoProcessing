@@ -19,7 +19,7 @@ module.exports = (req, res) => {
   };
 
   /************************* PHOTO METADATA *******************************/
-  photoMetaData(`${__dirname}/../../${req.file.path}`)
+    photoMetaData(`${__dirname}/../../${req.file.path}`)
     .then((gps) => {
       console.log('GPS', gps);
       response['gps'] = gps;
@@ -54,44 +54,42 @@ module.exports = (req, res) => {
           ContentType: 'image/jpeg'
         };
 
-        // s3.uploadAsync(options)
-        //   .then((upload) => {
-        //     console.log('hi you got dones')
-        //     res.send('hi you got dones')
-        //     let url = upload.Location;
+        s3.uploadAsync(options)
+          .then((upload) => {
+            let url = upload.Location;
 
-        //     response['url'] = url;
+            response['url'] = url;
 
-        //     // clarifai(url, (err, success) => {
-        //     //   console.log('on photo upload', success);
-        //     //   response['clarifaiKeywords'] = success;
+            clarifai(url, (err, success) => {
+              console.log('on photo upload', success);
+              response['clarifaiKeywords'] = success;
 
-        //     //   res.status(200).json(response);
-        //     //   /********************* NEED TO UPDATE FOR DEV *****************************/
-        //     //   axios.post('http://localhost:3000/savedPhoto', response)
-        //     //     .then(function (response) {
-        //     //       console.log(response);
-        //     //     })
-        //     //     .catch(function (error) {
-        //     //       console.log(error);
-        //     //     });
-        //     // });
+              res.status(200).json(response);
+              /********************* NEED TO UPDATE FOR DEV *****************************/
+              axios.post('http://localhost:3000/savedPhoto', response)
+                .then(function (response) {
+                  console.log(response);
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+            });
 
-        //     let deleteTemp = [tempPath, resizedPath];
+            let deleteTemp = [tempPath, resizedPath];
 
-        //     fs.unlink(path, (err, deleted) => {
-        //       if (err) {
-        //         console.log('Error on file delete: ', err);
-        //       } else {
-        //         console.log('Temp file deleted', deleted);
-        //       }
-        //     }); 
+            fs.unlink(path, (err, deleted) => {
+              if (err) {
+                console.log('Error on file delete: ', err);
+              } else {
+                console.log('Temp file deleted', deleted);
+              }
+            }); 
 
-        //   })
-        //   .catch((err) => {
-        //     console.log('Failure error: ', err);
-        //     return res.status(500).end('Upload to s3 failed');
-        //   });
+          })
+          .catch((err) => {
+            console.log('Failure error: ', err);
+            return res.status(500).end('Upload to s3 failed');
+          });
 
       }
     });
