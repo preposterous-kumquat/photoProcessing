@@ -9,3 +9,5 @@ api-key.js
 
 server/photoProcessers/temp
 server/temp
+server/test_photos
+tests/test_photos
