@@ -19,7 +19,10 @@ module.exports = (req, res) => {
   };
 
   /************************* PHOTO METADATA *******************************/
-    photoMetaData(`${__dirname}/../../${req.file.path}`)
+  // JULIE'S VERSION
+  photoMetaData(`${__dirname}/../${req.file.path}`) 
+
+  // photoMetaData(`${__dirname}/../../${req.file.path}`)
     .then((gps) => {
       console.log('GPS', gps);
       response['gps'] = gps;
@@ -30,12 +33,16 @@ module.exports = (req, res) => {
 
   /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
 
-
-  let tempPath = `${__dirname}/../../${req.file.path}`;
-  console.log(tempPath);
+  let tempPath = `${__dirname}/../${req.file.path}`;
+  console.log(tempPath, 'TEMP PATH')
   let fileName = req.file.originalname.split('.')[0];
   let fileExt = req.file.originalname.split('.')[1];
-  let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
+  // JULIE's
+
+  let resizedPath = `${__dirname}/../temp/${fileName}_smaller.${fileExt}`;
+
+  // let resizedPath = `${__dirname}/../../${fileName}_smaller.${fileExt}`;
+
 
   gm(tempPath)
     .resize(720, 720)
@@ -46,6 +53,7 @@ module.exports = (req, res) => {
         console.log(`Photo resized ${done}`);
 
         let fileStream = fs.readFileSync(resizedPath);
+
         let options = {
           ACL: 'public-read',
           Bucket: bucket,
@@ -60,18 +68,21 @@ module.exports = (req, res) => {
 
             response['url'] = url;
 
-            clarifai(url, (err, success) => {
-              console.log('on photo upload', success);
-              response['clarifaiKeywords'] = success;
+            // clarifai.nsfw(url, (err, success) => {
+            //   // console.log('NSFW SUCCESS',success,  err)
+            //   res.send(success)
+            // })
 
+            clarifai(url, (err, success) => {
+              response['clarifaiKeywords'] = success;
               res.status(200).json(response);
               /********************* NEED TO UPDATE FOR DEV *****************************/
               axios.post('http://localhost:3000/savedPhoto', response)
                 .then(function (response) {
-                  console.log(response);
+                  console.log('RECEIVED BY MAIN SERVER');
                 })
                 .catch(function (error) {
-                  console.log(error);
+                  console.log('ERROR ON MAIN SERVER: ', err);
                 });
             });
 
@@ -93,6 +104,8 @@ module.exports = (req, res) => {
 
       }
     });
+
+
 };
 
 
