@@ -7,4 +7,4 @@ api-key.js
 # DS Store
 .DS_Store
 
-server/config/photoProcessers/temp
+server/photoProcessers/temp
