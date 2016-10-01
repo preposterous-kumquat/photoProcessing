@@ -9,7 +9,10 @@ const helpers = require('../config/helpers').generateFilePath;
 const axios = require('axios');
 
 module.exports = (req, res) => {
-  console.log('ENTERED PHOTOUPLOAD', req.params.id);
+  // console.log('req OBJECT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>>>>>>', req);
+  // console.log('req.file>>>>>>', req.file);
+  // console.log('req.body>>*********>>>>', req.body);
+  // console.log('ENTERED PHOTOUPLOAD', req.params.id);
   let id = req.params.id;
   let path = generateFilePath(id, 3);
   let response = {
@@ -68,7 +71,7 @@ module.exports = (req, res) => {
               /********************* NEED TO UPDATE FOR DEV *****************************/
               axios.post('http://localhost:3000/savedPhoto', response)
                 .then(function (response) {
-                  console.log(response);
+                  console.log('Success! Here is the URL:', url);
                 })
                 .catch(function (error) {
                   console.log(error);
