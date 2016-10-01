@@ -34,11 +34,9 @@ module.exports = (req, res) => {
   /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
 
   let tempPath = `${__dirname}/../${req.file.path}`;
-  console.log(tempPath, 'TEMP PATH')
   let fileName = req.file.originalname.split('.')[0];
   let fileExt = req.file.originalname.split('.')[1];
   // JULIE's
-
   let resizedPath = `${__dirname}/../temp/${fileName}_smaller.${fileExt}`;
 
   // let resizedPath = `${__dirname}/../../${fileName}_smaller.${fileExt}`;
@@ -73,7 +71,7 @@ module.exports = (req, res) => {
             //   res.send(success)
             // })
 
-            clarifai(url, (err, success) => {
+            clarifai.keywords(url, (err, success) => {
               response['clarifaiKeywords'] = success;
               res.status(200).json(response);
               /********************* NEED TO UPDATE FOR DEV *****************************/
