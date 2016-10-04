@@ -21,7 +21,6 @@ module.exports = (req, res) => {
   /************************* PHOTO METADATA *******************************/
   // JULIE'S VERSION
   photoMetaData(`${__dirname}/../${req.file.path}`) 
-
   // photoMetaData(`${__dirname}/../../${req.file.path}`)
     .then((gps) => {
       console.log('GPS', gps);
@@ -38,11 +37,10 @@ module.exports = (req, res) => {
   let fileExt = req.file.originalname.split('.')[1];
   // JULIE's
   let resizedPath = `${__dirname}/../temp/${fileName}_smaller.${fileExt}`;
-
   // let resizedPath = `${__dirname}/../../${fileName}_smaller.${fileExt}`;
 
-
   gm(tempPath)
+    .setFormat('jpg')
     .resize(720, 720)
     .write(resizedPath, (err, done) => {
       if (err) { 
@@ -65,6 +63,7 @@ module.exports = (req, res) => {
             let url = upload.Location;
 
             response['url'] = url;
+            console.log('URL: ', url);
 
             // clarifai.nsfw(url, (err, success) => {
             //   // console.log('NSFW SUCCESS',success,  err)
@@ -74,10 +73,11 @@ module.exports = (req, res) => {
             clarifai.keywords(url, (err, success) => {
               response['clarifaiKeywords'] = success;
               res.status(200).json(response);
-              /********************* NEED TO UPDATE FOR DEV *****************************/
+              // ******************** NEED TO UPDATE FOR DEV ****************************
               axios.post('http://localhost:3000/savedPhoto', response)
-                .then(function (response) {
+                .then(function (res) {
                   console.log('RECEIVED BY MAIN SERVER');
+                  console.log('RESPONSE OBJECT: ', response);
                 })
                 .catch(function (error) {
                   console.log('ERROR ON MAIN SERVER: ', err);
@@ -85,14 +85,16 @@ module.exports = (req, res) => {
             });
 
             let deleteTemp = [tempPath, resizedPath];
+            deleteTemp.forEach((file) => {
+              fs.unlink(file, (err, deleted) => {
+                if (err) {
+                  console.log('Error on file delete: ', err);
+                } else {
+                  console.log('Temp file deleted', deleted);
+                }
+              }); 
+            });
 
-            fs.unlink(path, (err, deleted) => {
-              if (err) {
-                console.log('Error on file delete: ', err);
-              } else {
-                console.log('Temp file deleted', deleted);
-              }
-            }); 
 
           })
           .catch((err) => {
