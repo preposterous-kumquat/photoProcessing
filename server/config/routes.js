@@ -4,6 +4,5 @@ const validPhoto = require('../photoProcessers/validPhoto');
 
 module.exports = (app, express) => {
   app.post('/photoProcessor/validPhoto', multer, validPhoto);
-
   app.post('/photoProcessor/upload/:id', multer, photoUpload);
 };

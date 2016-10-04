@@ -7,10 +7,8 @@ module.exports = (req, res) => {
     .identify((err, done) => {
       if (err) {
         res.status(415).json({valid: false});
-        fs.unlink(tempPath);
       } else {
         res.json({valid: true});
-        fs.unlink(tempPath);
       }
     });
 };
