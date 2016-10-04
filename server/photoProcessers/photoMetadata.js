@@ -33,15 +33,6 @@ const convertDMSToDD = (degrees, minutes, seconds, direction) => {
   return dd;
 };
 
-// Promise:
-// module.exports = (filepath, callback) => {
-//   return new Promise(function(resolve, reject) {
-//     new ExifImage({ image: filepath }, function (error, exifData) {
-//       resolve(extractLatLongData(exifData));
-//       reject(error);
-//     });
-//   });
-// };
 
 
 

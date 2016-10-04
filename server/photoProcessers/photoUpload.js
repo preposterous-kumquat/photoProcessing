@@ -9,7 +9,6 @@ const helpers = require('../config/helpers').generateFilePath;
 const axios = require('axios');
 
 module.exports = (req, res) => {
-  console.log('ENTERED PHOTOUPLOAD', req.params.id);
   let id = req.params.id;
   let path = generateFilePath(id, 3);
   let response = {
@@ -17,9 +16,14 @@ module.exports = (req, res) => {
     path: path,
     theme: req.body.theme
   };
+  let tempPath = `${__dirname}/../../${req.file.path}`;
+  let fileName = req.body.name.split('.')[0];
+  let fileExt = req.body.name.split('.')[1];
+  let resizedPath = `${__dirname}/../../temp/${fileName}_smaller.${fileExt}`;
 
   /************************* PHOTO METADATA *******************************/
-    photoMetaData(`${__dirname}/../../${req.file.path}`)
+  // JULIE'S VERSION
+  photoMetaData(tempPath) 
     .then((gps) => {
       console.log('GPS', gps);
       response['gps'] = gps;
@@ -28,16 +32,17 @@ module.exports = (req, res) => {
       console.log('ERROR', err);
     });
 
-  /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
+  // /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
 
-
-  let tempPath = `${__dirname}/../../${req.file.path}`;
-  console.log(tempPath);
-  let fileName = req.file.originalname.split('.')[0];
-  let fileExt = req.file.originalname.split('.')[1];
-  let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
+  // let tempPath = `${__dirname}/../${req.file.path}`;
+  // let fileName = req.body.name.split('.')[0];
+  // let fileExt = req.body.name.split('.')[1];
+  // // JULIE's
+  // let resizedPath = `${__dirname}/../temp/${fileName}_smaller.${fileExt}`;
+  // // let resizedPath = `${__dirname}/../../${fileName}_smaller.${fileExt}`;
 
   gm(tempPath)
+    .setFormat('jpg')
     .resize(720, 720)
     .write(resizedPath, (err, done) => {
       if (err) { 
@@ -46,6 +51,7 @@ module.exports = (req, res) => {
         console.log(`Photo resized ${done}`);
 
         let fileStream = fs.readFileSync(resizedPath);
+
         let options = {
           ACL: 'public-read',
           Bucket: bucket,
@@ -59,31 +65,28 @@ module.exports = (req, res) => {
             let url = upload.Location;
 
             response['url'] = url;
+            console.log('URL: ', url);
 
-            clarifai(url, (err, success) => {
-              console.log('on photo upload', success);
+            // clarifai.nsfw(url, (err, success) => {
+            //   // console.log('NSFW SUCCESS',success,  err)
+            //   res.send(success)
+            // })
+
+            clarifai.keywords(url, (err, success) => {
               response['clarifaiKeywords'] = success;
-
               res.status(200).json(response);
-              /********************* NEED TO UPDATE FOR DEV *****************************/
-              axios.post('http://localhost:3000/savedPhoto', response)
-                .then(function (response) {
-                  console.log(response);
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
             });
 
             let deleteTemp = [tempPath, resizedPath];
-
-            fs.unlink(path, (err, deleted) => {
-              if (err) {
-                console.log('Error on file delete: ', err);
-              } else {
-                console.log('Temp file deleted', deleted);
-              }
-            }); 
+            deleteTemp.forEach((file) => {
+              fs.unlink(file, (err, deleted) => {
+                if (err) {
+                  console.log('Error on file delete: ', err);
+                } else {
+                  console.log('Temp file deleted');
+                }
+              }); 
+            });
 
           })
           .catch((err) => {
@@ -93,6 +96,8 @@ module.exports = (req, res) => {
 
       }
     });
+
+
 };
 
 
@@ -135,22 +140,6 @@ module.exports = (req, res) => {
 //   key: '000/Marce_smaller.jpg',
 //   Key: '000/Marce_smaller.jpg',
 //   Bucket: 'preposterous-kumquat.photos' }
-
-
-
-/*************** Node modules **********************/
-// EXIFIMAGE extracts GPS if there
-// SizeOf turns the resolution of item
-// imagemagick should resize
-
-/*************** flow of action **********************/
-// check if there is any metadata on the photo
-// if no gps data 
-  // send to the user that they must select a location
-// else check the resolution
-// check if photo has a dimension greater than 720x720
-// if greater than 720 then resize
-// return photopath
 
 
 // { fieldname: 'image',

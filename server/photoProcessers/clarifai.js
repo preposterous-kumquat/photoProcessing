@@ -3,7 +3,6 @@ const axios = require('axios');
 const request = require('request');
 const Clarifai = require('clarifai');
 
-
 const app = new Clarifai.App(
   `${clarifaiKeys.clientId}`,
   `${clarifaiKeys.clientSecret}`
@@ -11,57 +10,104 @@ const app = new Clarifai.App(
 
 let token = null;
 let expireTime = null;
+let keywordsUrl = `https://api.clarifai.com/v1/tag/?url=`
+let nsfwUrl = `https://api.clarifai.com/v1/tag/?model=nsfw-v1.0&url=`
 
+let checkToken = () => {
+  if (!token || Date.now() > expireTime) {
+    console.log('GENERATING TOKEN');
+    return getToken(); 
+  } else {
+    return true;
+  }
+}
 
-app.getToken()
+let getToken = () => { app.getToken()
   .then((response) => {
     token = response.access_token;
     expireTime = new Date(response.expireTime);
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    console.log('On load my token is here: ', token);
+    return true;
   });
-
-// function return the classes as an array
-module.exports = (url, callback) => {
-  url = `https://api.clarifai.com/v1/tag/?url=${url}`;
-  console.log('ENTERED CLARIFAI API, here is my url', url);
-  if (!token || Date.now() > expireTime) {
-    console.log('GENERATING TOKEN');
-    app.getToken()
-      .then((response) => {
-        token = response.access_token;
-        expireTime = new Date(response.expireTime);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        console.log('TOKEN: ', token);
-      }).then(() => {
-        axios.get(url)
-          .then((res) => {
-            console.log('SENDING GET REQUEST');
-            console.log('here is my res', res);
-            console.log('here is my res data', res.data.results[0].result.tag.classes);
-            callback(null, res.data.results[0].result.tag.classes);
-          })
-          .catch((err) => {
-            callback(err);
-          });
-      });
-  } else {
-    console.log('IN THE ELSE STATEMENT');
-    axios.get(url)
-      .then((res) => {
-        console.log('Already have a token', token);
-        console.log('here is my res', res);
-        console.log('here is my res data', res.data.results[0].result.tag.classes);
-        callback(null, res.data.results[0].result.tag.classes);
-      })
-      .catch((err) => {
-        console.log('I have an error, on get', err);
-        callback(err);
-      });
-  }
 };
 
+getToken();
 
+// function return the classes as an array
+module.exports = {
+  keywords: (url, callback) => {
+    url = `${keywordsUrl}${url}`;
+    if (checkToken()) {
+      axios.get(url)
+        .then((res) => {
+          console.log('here is my res data', res.data.results[0].result.tag.classes);
+          callback(null, res.data.results[0].result.tag.classes);
+        })
+        .catch((err) => {
+          callback(err);
+        });
+    } else {
+      console.log('Did not work');
+      callback('did not work')
+    }
+  },
+  nsfw: (url, callback) => {
+    url = `${nsfwUrl}${url}`;
+    console.log('got into nsfw', url)
+    if (checkToken()) {
+      console.log('Starting axios')
+      axios.get(url)
+        .then((res) => {
+          console.log('RESPONSE FROM NSFW', res.data.results[0].result.tag);
+          console.log('NSFW REQUEST 1:', res.data.results[0].result.tag.classes[0], 'RATING',res.data.results[0].result.tag.probs[0]);
+          console.log('NSFW REQUEST 2:', res.data.results[0].result.tag.classes[1], 'RATING',res.data.results[0].result.tag.probs[1]);
+          callback(null, [[res.data.results[0].result.tag.classes[0], res.data.results[0].result.tag.probs[0]], [res.data.results[0].result.tag.classes[1],res.data.results[0].result.tag.probs[1]]]);
+        })
+        .catch((err) => {
+          callback(err);
+        });
+    } else {
+      console.log('NSFW REQUEST DID NOT WORK');
+      callback('NSFW REQUEST DID NOT WORK ---> CALLBACK')
+    }
+
+  }
+}
+
+
+// keywords: (url, callback) => {
+//   url = `${keywordsUrl}${url}`;
+//   console.log('ENTERED CLARIFAI API, here is my url', url);
+//   if (!token || Date.now() > expireTime) {
+//     console.log('GENERATING TOKEN');
+//     app.getToken()
+//       .then((response) => {
+//         token = response.access_token;
+//         expireTime = new Date(response.expireTime);
+//         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+//         console.log('TOKEN: ', token);
+//       }).then(() => {
+//         axios.get(url)
+//           .then((res) => {
+//             console.log('here is my res data', res.data.results[0].result.tag.classes);
+//             callback(null, res.data.results[0].result.tag.classes);
+//           })
+//           .catch((err) => {
+//             callback(err);
+//           });
+//       });
+//   } else {
+//     axios.get(url)
+//       .then((res) => {
+//         console.log('here is my res data', res.data.results[0].result.tag.classes);
+//         callback(null, res.data.results[0].result.tag.classes);
+//       })
+//       .catch((err) => {
+//         console.log('I have an error, on get', err);
+//         callback(err);
+//       });
+//   }
+// },
 
 
   // .then((token) => {

@@ -8,3 +8,7 @@ api-key.js
 .DS_Store
 
 server/photoProcessers/temp
+server/temp
+server/test_photos
+tests/test_photos
+temp/
