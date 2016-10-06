@@ -42,11 +42,6 @@ module.exports = (req, res) => {
   // let resizedPath = `${__dirname}/../temp/${fileName}_smaller.${fileExt}`;
   // // let resizedPath = `${__dirname}/../../${fileName}_smaller.${fileExt}`;
 
-  let tempPath = `${__dirname}/../../${req.file.path}`;
-  let fileName = req.file.originalname.split('.')[0];
-  let fileExt = req.file.originalname.split('.')[1];
-  let resizedPath = `${__dirname}/temp/${fileName}_smaller.${fileExt}`;
-
   gm(tempPath)
     .setFormat('jpg')
     .resize(720, 720)
@@ -81,17 +76,7 @@ module.exports = (req, res) => {
             clarifai.keywords(url, (err, success) => {
               response['clarifaiKeywords'] = success;
               res.status(200).json(response);
-<<<<<<< 86c20581251ffa8ce5b1a5c32818318e3e618515
-=======
-              // ******************** NEED TO UPDATE FOR DEV ****************************
-              axios.post('http://localhost:3000/savedPhoto', response)
-                .then(function (response) {
-                  console.log(response);
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
->>>>>>> fix path
+
             });
 
             let deleteTemp = [tempPath, resizedPath];
