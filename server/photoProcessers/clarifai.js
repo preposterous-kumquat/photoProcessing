@@ -71,7 +71,35 @@ module.exports = {
       callback('NSFW REQUEST DID NOT WORK ---> CALLBACK')
     }
 
-  }
+  },
+  train: (req, res) => {
+    let start = req.body.firstNum;
+    let urls = [];
+    batchSize = 4;
+    for (let i = start; i <= start + batchSize; i++) {
+      urls.push("https://s3-us-west-2.amazonaws.com/preposterous-kumquat.photos/training/first+4500/im" + i + '.jpg')
+    }
+    url = `https://api.clarifai.com/v1/tag/?url=` + urls.join('&url=');
+    console.log(url)
+    if (checkToken()) {
+      axios.get(url)
+        .then((response) => {
+          let trainingCorpus = response.data.results.map( (item, index) => {
+            let id = 'td_'(index + start);
+            return {
+              id: id,
+              tokens: item.result.tag.classes
+            };
+          });
+          res.send(trainingCorpus);
+        })
+        .catch((err) => {
+          console.log(err);
+      });
+    } else {
+      console.log('Did not work');
+    }
+  },
 }
 
 
