@@ -20,7 +20,7 @@ let checkToken = () => {
   } else {
     return true;
   }
-}
+};
 
 let getToken = () => { app.getToken()
   .then((response) => {
