@@ -34,6 +34,7 @@ module.exports = (req, res) => {
 
   // /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
 
+
   // let tempPath = `${__dirname}/../${req.file.path}`;
   // let fileName = req.body.name.split('.')[0];
   // let fileExt = req.body.name.split('.')[1];
@@ -75,6 +76,7 @@ module.exports = (req, res) => {
             clarifai.keywords(url, (err, success) => {
               response['clarifaiKeywords'] = success;
               res.status(200).json(response);
+
             });
 
             let deleteTemp = [tempPath, resizedPath];

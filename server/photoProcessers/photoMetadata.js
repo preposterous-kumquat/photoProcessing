@@ -21,7 +21,17 @@ const extractLatLongData = (exif) => {
       long: convertDMSToDD(long[0], long[1], long[2], long[3])
     };
   } else {
-    return null;
+    // return null;
+    // ASSIGN RANDOM LAT AND LONG VALUES IF MISSING FROM METADATA!!!!!!! REMOVE IN PRODUCTION
+    let fromLat = -60;
+    let toLat = 75;
+    let fromLong = -180;
+    let toLong = 180;
+    let digits = 8;
+    return {
+      lat: (Math.random() * (toLat - fromLat) + fromLat).toFixed(digits) * 1,
+      long: (Math.random() * (toLong - fromLong) + fromLong).toFixed(digits) * 1
+    }
   }
 };
 
