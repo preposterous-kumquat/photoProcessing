@@ -25,7 +25,7 @@ Photo Processing Micro-service for photo upload to Amazon S3 and keyword generat
 
 ## Usage
 
-- POST /photoProcessor/upload/:id: 
+- POST /photoProcessor/upload/:id 
 Web server from [Lensity](https://github.com/preposterous-kumquat/preposterous-kumquat) sends POST /photoProcessor/upload/:id request to photo-processor service. Multer looks for the form data name attribute 'photo' and a save to local disk storage. Photo is scraped for GPS metadata, saved to S3 and then send to Clarifai AI to generate list of keywords associated with the photo.
 
 - POST /photoProcessor/validPhoto
@@ -53,10 +53,9 @@ nodemon
 
 ### API Key Set-Up:
 #### Create api-key.js
-Using 
-```sh
-Copy api-key-sample.js and rename to api-key.js
-```
+
+* Copy api-key-sample.js and rename to api-key.js
+
 #### S3 access keys
 * Set-up S3 account
 * Obtain access keys, bucket and region
@@ -65,8 +64,6 @@ Copy api-key-sample.js and rename to api-key.js
 #### Clarifai
 * Obtain access keys [Clarifai](https://developer.clarifai.com/signup/)
 * Update api-key.js
-
-
 
 
 ## Contributing
