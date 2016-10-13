@@ -1,4 +1,6 @@
-# [Lensity](https://github.com/preposterous-kumquat/preposterous-kumquat)
+# photoProcessing
+
+[Lensity](https://github.com/preposterous-kumquat/preposterous-kumquat) main repo
 
 Photo Processing Micro-service for photo upload to Amazon S3 and keyword generation from Clarifai API
 
@@ -7,7 +9,6 @@ Photo Processing Micro-service for photo upload to Amazon S3 and keyword generat
   - __Scrum Master__: [Julie Truong](https://github.com/Truong-Julie)
   - __Development Team Members__: [Brian Kilrain](https://github.com/bkilrain)
 
-# photoProcessing
 
 ## Table of Contents
 
