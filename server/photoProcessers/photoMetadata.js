@@ -31,7 +31,7 @@ const extractLatLongData = (exif) => {
     // return {
     //   lat: (Math.random() * (toLat - fromLat) + fromLat).toFixed(digits) * 1,
     //   long: (Math.random() * (toLong - fromLong) + fromLong).toFixed(digits) * 1
-    }
+    // }
   }
 };
 
