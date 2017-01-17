@@ -77,7 +77,7 @@ module.exports = {
     let urls = [];
     batchSize = req.body.batchSize;
     for (let i = start; i < start + batchSize; i++) {
-      urls.push("https://s3-us-west-2.amazonaws.com/preposterous-kumquat.photos/training/first+4500/im" + i + '.jpg')
+      urls.push("https://s3-us-west-2.amazonaws.com/prepkumquat/im" + i + '.jpg')
     }
     url = `https://api.clarifai.com/v1/tag/?url=` + urls.join('&url=');
     console.log(url)
