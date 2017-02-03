@@ -22,7 +22,6 @@ module.exports = (req, res) => {
   let resizedPath = `${__dirname}/../../temp/${fileName}_smaller.${fileExt}`;
 
   /************************* PHOTO METADATA *******************************/
-  // JULIE'S VERSION
   photoMetaData(tempPath) 
     .then((gps) => {
       console.log('GPS', gps);
@@ -33,15 +32,6 @@ module.exports = (req, res) => {
     });
 
   // /**************** RESIZING PHOTOS & SAVING PHOTO ************************/
-
-
-  // let tempPath = `${__dirname}/../${req.file.path}`;
-  // let fileName = req.body.name.split('.')[0];
-  // let fileExt = req.body.name.split('.')[1];
-  // // JULIE's
-  // let resizedPath = `${__dirname}/../temp/${fileName}_smaller.${fileExt}`;
-  // // let resizedPath = `${__dirname}/../../${fileName}_smaller.${fileExt}`;
-
   gm(tempPath)
     .setFormat('jpg')
     .resize(720, 720)
